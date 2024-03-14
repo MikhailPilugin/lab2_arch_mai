@@ -1,0 +1,115 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'API Сервиса докладов'
+servers:
+  - url: http://localhost:8081
+    description: Сервис докладов
+paths:
+  /report:
+    get:
+      summary: Получение списка докладов
+      responses:
+        '200':
+          description: Пользователи, соответствующие маске
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reports'
+        500:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /report/add:
+    post:
+      summary: Добавление нового пользователя
+      parameters:
+      - name: name
+        description: Название доклада
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: type
+        description: Тип доклада
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: author
+        description: Автор доклада
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: description
+        description: Описание доклада 
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Идентификатор добавленного доклада
+          content:
+            application/json:
+              schema:
+                type: integer
+        404:
+          description: Ошибка добавления доклада
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Неожиданная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    report_id:
+      description: Уникальный идентификатор доклада
+      type: integer
+    reports:
+      type: array
+      items:
+        $ref: '#/components/schemas/report'
+    report:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - author
+        - description
+      properties:
+        id:
+          $ref: '#/components/schemas/report_id'
+        name:
+          type: string
+        type:
+          type: string
+        author:
+          type: string
+        description:
+          type: string
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: Сообщение об ошибке
+          type: string
+  securitySchemes:
+      basicAuth:     
+        type: http
+        scheme: basic
+
+security:
+  - basicAuth: []

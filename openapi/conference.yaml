@@ -1,0 +1,103 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'API Сервиса конференций'
+servers:
+  - url: http://localhost:8082
+    description: Сервис конференций
+paths:
+  /conference:
+    get:
+      summary: Получение списка докладов в конференции
+      responses:
+        '200':
+          description: Доклады из конференции авторизованного пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reports'
+        401:
+          description: Позователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: string
+        500:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /conference/put:
+    post:
+      summary: Добавление доклада в конференцию
+      parameters:
+      - name: report_id
+        description: Идентификатор доклада
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Идентификатор конференции
+          content:
+            application/json:
+              schema:
+                type: integer
+        401:
+          description: Позователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Ошибка добавления доклада в конференцию
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Неожиданная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    reports:
+      type: array
+      items:
+        $ref: '#/components/schemas/report'
+    report:
+      type: object
+      required:
+        - name
+        - type
+        - manufactorer
+        - description
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        manufactorer:
+          type: string
+        description:
+          type: string
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: Сообщение об ошибке
+          type: string
+  securitySchemes:
+      basicAuth:     
+        type: http
+        scheme: basic
+
+security:
+  - basicAuth: []
